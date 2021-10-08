@@ -9,7 +9,7 @@ run:
 
 .PHONY: install
 install:
-	@cd scripts && bash install_pi.sh
+	@bash scripts/install_pi.sh
 
 .PHONY: copy
 copy:

@@ -4,16 +4,17 @@
 echo "Installing base dependencies"
 sudo apt-get update
 sudo apt-get install -y ffmpeg mpg321 \
-    libsm6 libxext6 python-pip python3-pip \
+    libsm6 libxext6 python3-pip python3-pip \
     libatlas-base-dev python3-h5py libgtk2.0-dev libgtk-3-0 \
     libilmbase-dev libopenexr-dev libgstreamer1.0-dev \
     gnustep-gui-runtime
 
+if grep -q 'env/' .gitignore ; then /bin/true ; else echo 'env/' >> .gitignore ; fi
 
 python3 -m pip install virtualenv
 
+echo "Activating project virtual environment in $PWD/env"
 python3 -m virtualenv -p python3 env
-echo 'env/' >> .gitignore
 . env/bin/activate
 pip install --upgrade pip setuptools wheel
 pip install -r src/requirements.txt
