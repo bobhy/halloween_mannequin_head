@@ -9,11 +9,11 @@ sudo apt-get install -y ffmpeg mpg321 \
     libilmbase-dev libopenexr-dev libgstreamer1.0-dev \
     gnustep-gui-runtime
 
-cd ../
 
 python3 -m pip install virtualenv
 
 python3 -m virtualenv -p python3 env
+echo 'env/' >> .gitignore
 . env/bin/activate
 pip install --upgrade pip setuptools wheel
 pip install -r src/requirements.txt
