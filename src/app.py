@@ -6,17 +6,22 @@ import requests
 import subprocess
 from rtsparty import Stream
 from objectdaddy import Daddy
+from utils import is_raspberrypi
 
 
 class HalloweenMannequinHead():
 
     def __init__(self):
         logging.info('Starting application')
+        self.on_pi = is_raspberrypi()
+        logging.debug(f'Platform detect: running on Raspberry Pi? {self.on_pi}')
+
         self._setup_stream()
         self._setup_object_recognition()
         self.server_mode = bool(os.environ.get('SERVER_MODE', False))
         if not self.server_mode:
-            self._setup_servo()
+            if self.on_pi:
+                self._setup_servo()
 
     def _setup_servo(self):
         """Sets up the servo; requires raspberry pi to run"""
