@@ -1,41 +1,41 @@
 import os
 import logging
-import threading
 import time
 import requests
-import subprocess
 from rtsparty import Stream
 from objectdaddy import Daddy
 from utils import is_raspberrypi
 
 
-class HalloweenMannequinHead():
-
+class HalloweenMannequinHead:
     def __init__(self):
-        logging.info('Starting application')
+        logging.info("Starting application")
         self.on_pi = is_raspberrypi()
-        logging.debug(f'Platform detect: running on Raspberry Pi? {self.on_pi}')
+        logging.debug(f"Platform detect: on_pi={self.on_pi}")
 
         self._setup_stream()
         self._setup_object_recognition()
-        self.server_mode = bool(os.environ.get('SERVER_MODE', False))
+        self.server_mode = bool(os.environ.get("SERVER_MODE", False))
         if not self.server_mode:
-            if self.on_pi:
-                self._setup_servo()
+            self._setup_servo()
 
     def _setup_servo(self):
         """Sets up the servo; requires raspberry pi to run"""
         from servo_controller import ServoController
+
         self.servo_controller = ServoController()
 
     def _setup_stream(self):
         """Set up the stream to the camera"""
-        logging.info('Starting stream')
-        self.stream = Stream(os.environ.get('STREAM_URI', None))
+        logging.info("Starting stream")
+        if self.on_pi:
+            self.stream = Stream(os.environ.get("STREAM_URI", None))
+        else:
+            logging.info(f"skipping camera setup on other-than-pi, for now. on_pi={self.on_pi}")
 
     def _setup_object_recognition(self):
         """Set up object recognition and load models"""
-        logging.info('Loading ML models')
+        logging.info("Loading ML models")
         self.daddy = Daddy()
 
     def get_person_location_x_percentage(self, detection):
@@ -47,10 +47,10 @@ class HalloweenMannequinHead():
     def person_detected(self, detection):
         """Call back for a person being detected"""
         x_percentage = self.get_person_location_x_percentage(detection)
-        print('x percentage {}'.format(x_percentage))
+        print("x percentage {}".format(x_percentage))
         if self.server_mode:
-            host = os.environ['RASPBERRY_PI_HOST']
-            url = 'http://{}:8000/servo/?p={}'.format(host, x_percentage)
+            host = os.environ["RASPBERRY_PI_HOST"]
+            url = "http://{}:8000/servo/?p={}".format(host, x_percentage)
             requests.get(url)
         else:
             self.servo_controller.set_servo_percent(x_percentage)
@@ -72,12 +72,15 @@ class HalloweenMannequinHead():
     def run(self):
         """Run the application"""
         try:
-            self.process_frames_from_stream()
+            if self.on_pi:
+                self.process_frames_from_stream()
+            else:
+                logging.info(f"not on raspi, no camera yet.")
         except KeyboardInterrupt:
-            logging.info('Exiting application')
+            logging.info("Exiting application")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
     hmh = HalloweenMannequinHead()

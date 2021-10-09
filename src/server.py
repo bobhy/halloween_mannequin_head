@@ -1,12 +1,27 @@
-"""Components for running the raspberry pi in server mode"""
+"""Components for running the raspberry pi in server mode
+
+    Checks whether running on real Raspberry PI
+    Only tries to command the servo if so.
+    If not, just logs what the percentage was.
+
+    bugbug: need some range checking on percentage.  What if it's < 0 or > 100?
+"""
 
 import os
+import logging
 from flask import Flask, jsonify, request
-from servo_controller import ServoController
+from utils import is_raspberrypi
 
+logging.basicConfig()
+logging.getLogger().setLevel(logging.INFO)
+on_pi = is_raspberrypi()
+
+logging.info(f'Starting servo server, on_py = {on_pi}')
 
 app = Flask(__name__)
-sc = ServoController()
+if on_pi:
+    from servo_controller import ServoController
+    sc = ServoController()
 
 
 @app.route('/')
@@ -19,10 +34,24 @@ def index():
 def alarm():
     """Turn on the relay"""
     percentage = request.args.get('p')
+
     if not percentage:
-        return jsonify({'status': 'no p'})
-    sc.set_servo_percent(float(percentage))
-    return jsonify({'status': 'p={}'.format(percentage)})
+        ret_status = 'no p'
+    else:
+        try:
+            f_pct = float(percentage)
+            if (f_pct < 0) or (f_pct > 100):
+                ret_status = 'p out of range [0,100]'
+            else:
+                ret_status = f'p={f_pct:5.2f}'
+                if on_pi:
+                    sc.set_servo_percent(f_pct)
+                else:
+                    logging.info(f'on_pi={on_pi}, set position {f_pct:5.2f}%')
+        except ValueError:
+            ret_status = 'non-numeric p'
+
+    return jsonify({'status': ret_status})
 
 
 if __name__ == '__main__':
