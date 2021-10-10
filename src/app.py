@@ -28,10 +28,13 @@ class HalloweenMannequinHead:
     def _setup_stream(self):
         """Set up the stream to the camera"""
         logging.info("Starting stream")
-        if self.on_pi:
-            self.stream = Stream(os.environ.get("STREAM_URI", None))
+        stream_uri = os.environ.get("STREAM_URI", None)
+        if stream_uri or self.on_pi:
+            self.stream = Stream(stream_uri)
         else:
-            logging.info(f"skipping camera setup on other-than-pi, for now. on_pi={self.on_pi}")
+            logging.info(
+                f"can't access local webcam, not running on Raspberry Pi.  Set env STREAM_URI to access a webcam over network. on_pi={self.on_pi}"
+            )
 
     def _setup_object_recognition(self):
         """Set up object recognition and load models"""
@@ -49,7 +52,7 @@ class HalloweenMannequinHead:
         x_percentage = self.get_person_location_x_percentage(detection)
         print("x percentage {}".format(x_percentage))
         if self.server_mode:
-            host = os.environ["RASPBERRY_PI_HOST"]
+            host = os.environ.get("RASPBERRY_PI_HOST", "localhost")
             url = "http://{}:8000/servo/?p={}".format(host, x_percentage)
             requests.get(url)
         else:
@@ -72,10 +75,7 @@ class HalloweenMannequinHead:
     def run(self):
         """Run the application"""
         try:
-            if self.on_pi:
-                self.process_frames_from_stream()
-            else:
-                logging.info(f"not on raspi, no camera yet.")
+            self.process_frames_from_stream()
         except KeyboardInterrupt:
             logging.info("Exiting application")
 

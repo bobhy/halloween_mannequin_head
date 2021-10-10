@@ -9,7 +9,11 @@
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "env": {
+                "SERVER_MODE": "True",
+                "FOO": "bar"
+            }
         },
         {
             "name": "control app",
@@ -17,7 +21,8 @@
             "request": "launch",
             "program": "src/app.py",
             "env": {
-                "SERVER_MODE": "True"
+                "SERVER_MODE": "True",
+                "FOO": "bar"
             },
             "console": "integratedTerminal"
         },

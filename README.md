@@ -18,3 +18,10 @@ SERVER_MODE=True
 # Stream URL - set this if you're using an external camera like the Wyze V2
 STREAM_URI=rtsp://username:password@host/live/
 ```
+
+## Change notes
+* app tests for being invoked on non-RPI yet linux dev machine, doesn't try to initialize servos if not.
+Supports development under WSL on windows.
+Also install JMPEG streamer app from windows store to remote laptop camera.
+* added range checks to servo server inputs
+* note: debugging under
