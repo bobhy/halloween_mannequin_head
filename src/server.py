@@ -46,7 +46,7 @@ def alarm():
                 if on_pi:
                     sc.set_servo_fraction(f_fraction)
                 else:
-                    logging.info(f'on_pi={on_pi}, set travel {f_fraction:4.2f}%')
+                    logging.info(f'on_pi={on_pi}, set travel {f_fraction:4.2f}')
         except ValueError:
             ret_status = 'non-numeric f'
 

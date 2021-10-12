@@ -51,7 +51,7 @@ class HalloweenMannequinHead:
     def person_detected(self, detection):
         """Call back for a person being detected"""
         x_fraction = self.get_person_location_x_fraction(detection)
-        logging.debug(f"x fraction {x_fraction}")
+        logging.info(f"x fraction {x_fraction}")
         if self.server_mode:
             host = os.environ.get("RASPBERRY_PI_HOST", "localhost")
             url = "http://{}:8000/servo/?f={}".format(host, x_fraction)
