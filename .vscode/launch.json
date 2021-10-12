@@ -23,7 +23,7 @@
             "env": {
                 "SERVER_MODE": "True",
                 "RASPBERRY_PI_HOST": "localhost",
-                "STREAM_URI": "${fileWorkspaceFolder}/mh1.mp4",
+                "STREAM_URI": "/mnt/c/Users/bobhy/Documents/mh1.mp4",
                 "OPENCV_FFMPEG_CAPTURE_OPTIONS": "rtsp_transport;udp | fflags;nobuffer | flag;low_delay",
                 "FOO": "bar"
             },

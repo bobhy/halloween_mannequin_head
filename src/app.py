@@ -33,7 +33,8 @@ class HalloweenMannequinHead:
             self.stream = Stream(stream_uri)
         else:
             logging.info(
-                f"can't access local webcam, not running on Raspberry Pi.  Set env STREAM_URI to access a webcam over network. on_pi={self.on_pi}"
+                f"""can't access local webcam, not running on Raspberry Pi.
+                Set env STREAM_URI to access a webcam over network. on_pi={self.on_pi}"""
             )
 
     def _setup_object_recognition(self):
