@@ -3,11 +3,10 @@ import time
 import logging
 
 
-class ServoController():
-
+class ServoController:
     def __init__(self):
         """Set up the servos"""
-        logging.info('Setting up servo')
+        logging.info("Setting up servo")
         self.servo_pin = 3
         self._setup_gpio()
         self._set_servo_range()
@@ -31,16 +30,22 @@ class ServoController():
         self.pwm = gpio.PWM(self.servo_pin, 50)
         self.pwm.start(0)
 
-    def set_servo_angle(self, angle):
+    def set_servo_angle(self, angle: int):
         """Set the angle of the servo"""
-        logging.info('Setting angle to {}'.format(angle))
+        logging.info("Setting angle to {}".format(angle))
         gpio.output(self.servo_pin, True)
         self.pwm.ChangeDutyCycle(angle / 18 + 2)
         time.sleep(1)
         gpio.output(self.servo_pin, False)
         self.pwm.ChangeDutyCycle(0)
 
-    def set_servo_percent(self, percent):
-        """Converts a decimal percentage into servo angle"""
-        angle = int((1 - percent) * self.servo_range) + self.servo_min
+    def set_servo_fraction(self, fraction: float):
+        """ "Converts a fraction of full travel into servo angle
+
+        Args:
+            fraction (float): a real [0,1.0] represents desired servo travel.
+                             Not a "percentage", fraction value of 0.5 requests neutral,
+                             0.0 is one extreme, 1.0 is the other.
+        """
+        angle = int((1 - fraction) * self.servo_range) + self.servo_min
         self.set_servo_angle(angle)

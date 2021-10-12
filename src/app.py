@@ -41,22 +41,22 @@ class HalloweenMannequinHead:
         logging.info("Loading ML models")
         self.daddy = Daddy()
 
-    def get_person_location_x_percentage(self, detection):
-        """Returns the person's horizontal location in the frame as a percentage"""
+    def get_person_location_x_fraction(self, detection):
+        """Returns the person's horizontal location in the frame as a fraction of the full frame"""
         frame_height, frame_width = detection.frame.shape[:2]
-        percentage = round(detection.x / float(frame_width), 2)
-        return percentage
+        fraction = round(detection.x / float(frame_width), 2)
+        return fraction
 
     def person_detected(self, detection):
         """Call back for a person being detected"""
-        x_percentage = self.get_person_location_x_percentage(detection)
-        print("x percentage {}".format(x_percentage))
+        x_fraction = self.get_person_location_x_fraction(detection)
+        logging.debug(f"x fraction {x_fraction}")
         if self.server_mode:
             host = os.environ.get("RASPBERRY_PI_HOST", "localhost")
-            url = "http://{}:8000/servo/?p={}".format(host, x_percentage)
+            url = "http://{}:8000/servo/?f={}".format(host, x_fraction)
             requests.get(url)
         else:
-            self.servo_controller.set_servo_percent(x_percentage)
+            self.servo_controller.set_servo_fraction(x_fraction)
 
     def process_frames_from_stream(self):
         """Processes the frames from the stream"""

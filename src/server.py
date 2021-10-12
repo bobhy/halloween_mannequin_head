@@ -2,9 +2,8 @@
 
     Checks whether running on real Raspberry PI
     Only tries to command the servo if so.
-    If not, just logs what the percentage was.
+    If not, just logs what the fraction of travel was.
 
-    bugbug: need some range checking on percentage.  What if it's < 0 or > 100?
 """
 
 import os
@@ -33,23 +32,23 @@ def index():
 @app.route('/servo/')
 def alarm():
     """Turn on the relay"""
-    percentage = request.args.get('p')
+    fraction = request.args.get('f')
 
-    if not percentage:
-        ret_status = 'no p'
+    if not fraction:
+        ret_status = 'no f'
     else:
         try:
-            f_pct = float(percentage)
-            if (f_pct < 0) or (f_pct > 100):
-                ret_status = 'p out of range [0,100]'
+            f_fraction = float(fraction)
+            if (f_fraction < 0) or (f_fraction > 1.0):
+                ret_status = 'f out of range [0, 1.0]'
             else:
-                ret_status = f'p={f_pct:5.2f}'
+                ret_status = f'f={f_fraction:4.2f}'
                 if on_pi:
-                    sc.set_servo_percent(f_pct)
+                    sc.set_servo_fraction(f_fraction)
                 else:
-                    logging.info(f'on_pi={on_pi}, set position {f_pct:5.2f}%')
+                    logging.info(f'on_pi={on_pi}, set travel {f_fraction:4.2f}%')
         except ValueError:
-            ret_status = 'non-numeric p'
+            ret_status = 'non-numeric f'
 
     return jsonify({'status': ret_status})
 
