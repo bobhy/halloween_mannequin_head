@@ -14,6 +14,7 @@ if grep -q 'env/' .gitignore ; then /bin/true ; else echo 'env/' >> .gitignore ;
 python3 -m pip install virtualenv
 
 echo "Activating project virtual environment in $PWD/env"
+# note - if installing python10 (non-default python3?), may need --system-site-packages (or pip can't find module pip??)
 python3 -m virtualenv -p python3 env
 . env/bin/activate
 pip install --upgrade pip setuptools wheel
