@@ -13,10 +13,11 @@
             "env": {
                 "SERVER_MODE": "True",
                 "FOO": "bar"
-            }
+            },
+            "justMyCode": false
         },
         {
-            "name": "control app",
+            "name": "control app - from file",
             "type": "python",
             "request": "launch",
             "program": "src/app.py",
@@ -31,6 +32,18 @@
             "justMyCode": false
         },
         {
+            "name": "control app",
+            "type": "python",
+            "request": "launch",
+            "program": "src/app.py",
+            "env": {
+                "RASPBERRY_PI_HOST": "localhost",
+                "OPENCV_FFMPEG_CAPTURE_OPTIONS": "rtsp_transport;udp | fflags;nobuffer | flag;low_delay"
+            },
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
             "name": "servoServer",
             "type": "python",
             "request": "launch",
@@ -40,10 +53,23 @@
             },
             "console": "integratedTerminal"
         },
+        {
+            "name": "camera test",
+            "type": "python",
+            "request": "launch",
+            "program": "src/camera_only.py",
+            "console": "integratedTerminal",
+            "env": {
+                "SERVER_MODE": "True",
+                "FOO": "bar"
+            },
+            "justMyCode": false,
+            "cwd": "${workspaceFolder}"
+        }
     ],
     "compounds": [
         {
-            "name": "servoServer and control app",
+            "name": "servoServer and control app - from file",
             "configurations": [
                 "servoServer",
                 "control app"
