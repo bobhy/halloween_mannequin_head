@@ -1,13 +1,9 @@
-"""App test camera and object recognition"""
 import os
 import logging
 import time
 import requests
-
 from rtsparty import Stream
 from objectdaddy import Daddy
-
-import cv2
 from utils import is_raspberrypi
 
 
@@ -15,17 +11,18 @@ class HalloweenMannequinHead:
     def __init__(self):
         logging.info("Starting application")
         self.on_pi = is_raspberrypi()
+        logging.debug(f"Platform detect: on_pi={self.on_pi}")
 
         self._setup_stream()
         self._setup_object_recognition()
         self.server_mode = bool(os.environ.get("SERVER_MODE", False))
-#        if not self.server_mode:
-#            self._setup_servo()
-        self._setup_servo()
+        if not self.server_mode:
+            self._setup_servo()
 
     def _setup_servo(self):
         """Sets up the servo; requires raspberry pi to run"""
         from servo_controller import ServoController
+
         self.servo_controller = ServoController()
 
     def _setup_stream(self):
@@ -45,16 +42,16 @@ class HalloweenMannequinHead:
         logging.info("Loading ML models")
         self.daddy = Daddy()
 
-    def get_location_x_fraction(self, detection):
-        """Returns the object's horizontal location in the frame as a fraction of the full frame"""
+    def get_person_location_x_fraction(self, detection):
+        """Returns the person's horizontal location in the frame as a fraction of the full frame"""
         frame_height, frame_width = detection.frame.shape[:2]
         fraction = round(detection.x / float(frame_width), 2)
         return fraction
 
-    def object_detected(self, detection):
-        """Call back for some recognized objct being detected"""
-        x_fraction = self.get_location_x_fraction(detection)
-        logging.info(f"object detected: {detection.label} at {x_fraction}")
+    def person_detected(self, detection):
+        """Call back for a person being detected"""
+        x_fraction = self.get_person_location_x_fraction(detection)
+        logging.info(f"x fraction {x_fraction}")
         if self.server_mode:
             host = os.environ.get("RASPBERRY_PI_HOST", "localhost")
             url = "http://{}:8000/servo/?f={}".format(host, x_fraction)
@@ -70,12 +67,9 @@ class HalloweenMannequinHead:
                 continue
             self.latest_frame = frame
             results, frame = self.daddy.process_frame(frame)
-            cv2.imshow("Live Playback", frame)
-            cv2.waitKey(10)
-
             for detection in results:
-                ##if detection.is_person():
-                self.object_detected(detection)
+                if detection.is_person():
+                    self.person_detected(detection)
             if self.server_mode:
                 time.sleep(0.1)
 
