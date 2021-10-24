@@ -7,8 +7,8 @@ class ServoController:
     def __init__(self):
         """Set up the servos"""
         logging.info("Setting up servo")
-        self.servo_pin = 3
-        self._setup_gpio()
+        self.servo_pin = 17
+        self._setup_gpio(self.servo_pin)
         self._set_servo_range()
 
     def _set_servo_range(self):
@@ -23,9 +23,10 @@ class ServoController:
         self.pwm.stop()
         gpio.cleanup()
 
-    def _setup_gpio(self):
-        """Set up the gpio"""
-        gpio.setmode(gpio.BOARD)
+    def _setup_gpio(self, on_gpio_pin):
+        """Set up the gpio on (GPIO) pin"""
+        gpio.setmode(gpio.BCM)
+        self.servo_pin = on_gpio_pin
         gpio.setup(self.servo_pin, gpio.OUT)
         self.pwm = gpio.PWM(self.servo_pin, 50)
         self.pwm.start(0)

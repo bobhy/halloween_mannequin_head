@@ -11,7 +11,6 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "env": {
-                "SERVER_MODE": "True",
                 "FOO": "bar"
             },
             "justMyCode": false
@@ -60,7 +59,7 @@
             "program": "src/camera_only.py",
             "console": "integratedTerminal",
             "env": {
-                "SERVER_MODE": "True",
+                "SERVER_MODE": "False",
                 "FOO": "bar"
             },
             "justMyCode": false,
