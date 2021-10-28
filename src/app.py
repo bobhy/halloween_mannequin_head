@@ -19,13 +19,14 @@ class HalloweenMannequinHead:
         self._setup_stream()
         self._setup_object_recognition()
         self.server_mode = bool(os.environ.get("SERVER_MODE", False))
-#        if not self.server_mode:
-#            self._setup_servo()
+        #        if not self.server_mode:
+        #            self._setup_servo()
         self._setup_servo()
 
     def _setup_servo(self):
         """Sets up the servo; requires raspberry pi to run"""
         from servo_controller import ServoController
+
         self.servo_controller = ServoController()
 
     def _setup_stream(self):
@@ -69,13 +70,15 @@ class HalloweenMannequinHead:
             if self.stream.is_frame_empty(frame):
                 continue
             self.latest_frame = frame
-            results, frame = self.daddy.process_frame(frame)
+            results, frame = self.daddy.process_frame(frame, draw_bounding_boxes=True)
             cv2.imshow("Live Playback", frame)
-            cv2.waitKey(10)
+            cv2.waitKey(1)
 
             for detection in results:
-                ##if detection.is_person():
-                self.object_detected(detection)
+                if detection.is_person():
+                    self.object_detected(detection)
+                else:
+                    logging.info(f".. ignoring object: {detection.label}")
             if self.server_mode:
                 time.sleep(0.1)
 

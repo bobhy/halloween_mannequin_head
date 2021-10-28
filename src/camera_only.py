@@ -60,7 +60,7 @@ class HalloweenMannequinHead:
             url = "http://{}:8000/servo/?f={}".format(host, x_fraction)
             requests.get(url)
         else:
-           self.servo_controller.set_servo_fraction(x_fraction)
+            self.servo_controller.set_servo_fraction(x_fraction)
 
     def process_frames_from_stream(self):
         """Processes the frames from the stream"""
