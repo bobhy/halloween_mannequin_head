@@ -55,7 +55,6 @@ class HalloweenMannequinHead:
     def object_detected(self, detection):
         """Call back for some recognized objct being detected"""
         x_fraction = self.get_location_x_fraction(detection)
-        logging.info(f"object detected: {detection.label} at {x_fraction}")
         if self.server_mode:
             host = os.environ.get("RASPBERRY_PI_HOST", "localhost")
             url = "http://{}:8000/servo/?f={}".format(host, x_fraction)
@@ -63,8 +62,9 @@ class HalloweenMannequinHead:
         else:
             self.servo_controller.set_servo_fraction(x_fraction)
 
-    def process_frames_from_stream(self):
+    def process_frames_from_stream(self, accept_list):
         """Processes the frames from the stream"""
+        accept_set = set(accept_list)
         while True:
             frame = self.stream.get_frame()
             if self.stream.is_frame_empty(frame):
@@ -75,18 +75,21 @@ class HalloweenMannequinHead:
             cv2.waitKey(1)
 
             for detection in results:
-                if detection.is_person():
+                if (detection.label in accept_set) or detection.is_person():
+                    logging.info(f"{detection.label} detected")
                     self.object_detected(detection)
                 else:
-                    logging.info(f".. ignoring object: {detection.label}")
-            if self.server_mode:
-                time.sleep(0.1)
+                    logging.info(f".. {detection.label} ignored.")
+            
+            time.sleep(0.1)     # don't busy loop
 
-    def run(self):
+    def run(self, accept_list):
         """Run the application"""
         try:
-            self.process_frames_from_stream()
+            self.process_frames_from_stream(accept_list)
         except KeyboardInterrupt:
+            if self.servo_controller:
+                del self.servo_controller
             logging.info("Exiting application")
 
 
@@ -94,4 +97,4 @@ if __name__ == "__main__":
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)
     hmh = HalloweenMannequinHead()
-    hmh.run()
+    hmh.run(["person", "cat", "dog"])
