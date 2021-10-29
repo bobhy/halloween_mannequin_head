@@ -28,6 +28,7 @@ class HalloweenMannequinHead:
         from servo_controller import ServoController
 
         self.servo_controller = ServoController()
+        self.servo_controller.set_servo_fraction(.5)
 
     def _setup_stream(self):
         """Set up the stream to the camera"""
@@ -89,6 +90,7 @@ class HalloweenMannequinHead:
             self.process_frames_from_stream(accept_list)
         except KeyboardInterrupt:
             if self.servo_controller:
+                self.servo_controller.set_servo_fraction(.5)    # try to neutral on exit, may fail.
                 del self.servo_controller
             logging.info("Exiting application")
 
